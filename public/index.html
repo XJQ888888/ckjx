@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>长坤机械订单管理系统 - 登录</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.2/pixi.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Noto Sans SC', sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); overflow: hidden; }
+    .particle-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+    .glass-effect { background: rgba(30, 41, 59, 0.3); backdrop-filter: blur(10px); border: 1px solid rgba(148, 163, 184, 0.2); }
+    .gradient-text { background: linear-gradient(135deg, #06b6d4, #0891b2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .input-field { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(148, 163, 184, 0.3); transition: all 0.3s ease; }
+    .input-field:focus { border-color: #06b6d4; box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1); }
+    .login-btn { background: linear-gradient(135deg, #06b6d4, #0891b2); transition: all 0.3s ease; }
+    .login-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(6, 182, 212, 0.3); }
+    .status-indicator { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center">
+  <!-- 粒子背景 -->
+  <div id="particle-container" class="particle-bg"></div>
+
+  <!-- 登录容器 -->
+  <div class="glass-effect rounded-2xl p-8 w-full max-w-md mx-4 transform transition-all duration-500" id="login-container">
+    <!-- Logo 和标题 -->
+    <div class="text-center mb-8">
+      <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-full flex items-center justify-center">
+        <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <h1 class="text-3xl font-bold gradient-text mb-2">长坤机械</h1>
+      <p class="text-slate-400 text-sm">订单管理系统</p>
+    </div>
+
+    <!-- 登录表单 -->
+    <form id="loginForm" class="space-y-6">
+      <div>
+        <label class="block text-sm font-medium text-slate-300 mb-2">用户名</label>
+        <input type="text" id="username" class="input-field w-full px-4 py-3 rounded-lg text-white placeholder-slate-500 focus:outline-none" placeholder="请输入用户名" required>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-300 mb-2">密码</label>
+        <input type="password" id="password" class="input-field w-full px-4 py-3 rounded-lg text-white placeholder-slate-500 focus:outline-none" placeholder="请输入密码" required>
+      </div>
+
+      <!-- 数据库连接状态 -->
+      <div class="flex items-center justify-between text-sm">
+        <div class="flex items-center space-x-2">
+          <div id="db-status" class="w-2 h-2 bg-red-500 rounded-full status-indicator"></div>
+          <span class="text-slate-400">数据库状态</span>
+        </div>
+        <span id="server-info" class="text-slate-500">192.168.10.22:3001</span>
+      </div>
+
+      <!-- 登录按钮 -->
+      <button type="submit" class="login-btn w-full py-3 rounded-lg text-white font-medium text-lg">登录系统</button>
+    </form>
+
+    <!-- 版权信息 -->
+    <div class="text-center mt-6 text-xs text-slate-500">
+      <p>© 2024 长坤机械订单管理系统</p>
+    </div>
+  </div>
+
+  <!-- 加载动画 -->
+  <div id="loading-overlay" class="fixed inset-0 bg-slate-900 bg-opacity-80 flex items-center justify-center z-50 hidden">
+    <div class="text-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto mb-4"></div>
+      <p class="text-slate-300">正在验证登录信息...</p>
+    </div>
+  </div>
+
+  <script>
+    // 粒子背景效果
+    const app = new PIXI.Application({
+      width: window.innerWidth,
+      height: window.innerHeight,
+      backgroundColor: 0x000000,
+      backgroundAlpha: 0
+    });
+    document.getElementById('particle-container').appendChild(app.view);
+
+    const particles = [];
+    const particleCount = 50;
+
+    for (let i = 0; i < particleCount; i++) {
+      const particle = new PIXI.Graphics();
+      particle.beginFill(0x06b6d4, 0.3);
+      particle.drawCircle(0, 0, Math.random() * 3 + 1);
+      particle.endFill();
+      particle.x = Math.random() * app.screen.width;
+      particle.y = Math.random() * app.screen.height;
+      particle.vx = (Math.random() - 0.5) * 0.5;
+      particle.vy = (Math.random() - 0.5) * 0.5;
+      app.stage.addChild(particle);
+      particles.push(particle);
+    }
+
+    app.ticker.add(() => {
+      particles.forEach(particle => {
+        particle.x += particle.vx;
+        particle.y += particle.vy;
+        if (particle.x < 0) particle.x = app.screen.width;
+        if (particle.x > app.screen.width) particle.x = 0;
+        if (particle.y < 0) particle.y = app.screen.height;
+        if (particle.y > app.screen.height) particle.y = 0;
+      });
+    });
+
+    window.addEventListener('resize', () => {
+      app.renderer.resize(window.innerWidth, window.innerHeight);
+    });
+
+    // 登录容器动画
+    anime({
+      targets: '#login-container',
+      opacity: [0, 1],
+      translateY: [50, 0],
+      duration: 1000,
+      easing: 'easeOutQuart'
+    });
+
+    // 数据库连接检查
+    async function checkDatabaseConnection() {
+      const statusIndicator = document.getElementById('db-status');
+      try {
+        const res = await fetch('http://192.168.10.22:3001/api/health');
+        if (res.ok) {
+          statusIndicator.classList.remove('bg-red-500');
+          statusIndicator.classList.add('bg-green-500');
+        } else {
+          statusIndicator.classList.remove('bg-green-500');
+          statusIndicator.classList.add('bg-red-500');
+        }
+      } catch {
+        statusIndicator.classList.remove('bg-green-500');
+        statusIndicator.classList.add('bg-red-500');
+      }
+    }
+
+    // 页面加载时检查数据库连接
+    checkDatabaseConnection();
+    setInterval(checkDatabaseConnection, 5000);
+
+    // 登录表单处理
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const loadingOverlay = document.getElementById('loading-overlay');
+
+      if (!username || !password) {
+        alert('请输入用户名和密码');
+        return;
+      }
+
+      // 显示加载动画
+      loadingOverlay.classList.remove('hidden');
+
+      try {
+        const response = await fetch('http://192.168.10.22:3001/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          localStorage.setItem('user', JSON.stringify(data.user));
+          localStorage.setItem('token', data.token);
+          setTimeout(() => {
+            window.location.href = 'dashboard.html';
+          }, 1000);
+        } else {
+          const error = await response.json();
+          alert('登录失败：' + (error.message || '未知错误'));
+        }
+      } catch (error) {
+        alert('登录失败：无法连接到服务器');
+      } finally {
+        loadingOverlay.classList.add('hidden');
+      }
+    });
+
+    // 输入框焦点动画
+    document.querySelectorAll('.input-field').forEach(input => {
+      input.addEventListener('focus', () => {
+        anime({ targets: input, scale: [1, 1.02], duration: 200, easing: 'easeOutQuart' });
+      });
+      input.addEventListener('blur', () => {
+        anime({ targets: input, scale: [1.02, 1], duration: 200, easing: 'easeOutQuart' });
+      });
+    });
+  </script>
+</body>
+</html>

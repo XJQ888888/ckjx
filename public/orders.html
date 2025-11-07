@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+  <title>长坤机械订单管理系统 - 订单管理</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+  <style>
+    body{font-family:'Noto Sans SC',sans-serif;background:#0f172a;}
+    .sidebar{background:linear-gradient(180deg,#1e293b 0%,#334155 100%);border-right:1px solid rgba(148,163,184,.2);}
+    .content-area{background:#0f172a;}
+    .nav-item{transition:all .3s ease;border-left:3px solid transparent;}
+    .nav-item:hover,.nav-item.active{background:rgba(6,182,212,.1);border-left-color:#06b6d4;}
+    .card{background:linear-gradient(135deg,rgba(30,41,59,.8) 0%,rgba(51,65,85,.6) 100%);border:1px solid rgba(148,163,184,.2);backdrop-filter:blur(10px);}
+    .input-field{background:rgba(15,23,42,.8);border:1px solid rgba(148,163,184,.3);transition:all .3s ease;}
+    .input-field:focus{border-color:#06b6d4;box-shadow:0 0 0 3px rgba(6,182,212,.1);}
+    .btn-primary{background:linear-gradient(135deg,#06b6d4,#0891b2);transition:all .3s ease;}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(6,182,212,.3);}
+    .order-row{transition:all .3s ease;cursor:pointer;}
+    .order-row:hover{background:rgba(6,182,212,.05);}
+    .status-badge{padding:4px 8px;border-radius:12px;font-size:12px;font-weight:500;}
+    .status-tech{background:rgba(139,92,246,.2);color:#a78bfa;}
+    .status-layout{background:rgba(99,102,241,.2);color:#818cf8;}
+    .status-laser{background:rgba(59,130,246,.2);color:#60a5fa;}
+    .status-bend{background:rgba(16,185,129,.2);color:#34d399;}
+    .status-weld{background:rgba(245,158,11,.2);color:#fbbf24;}
+    .status-paint{background:rgba(239,68,68,.2);color:#f87171;}
+    .status-delivered{background:rgba(34,197,94,.2);color:#4ade80;}
+    .status-repair{background:rgba(239,68,68,.3);color:#fca5a5;}
+    .status-sec-delivery{background:rgba(168,85,247,.2);color:#c084fc;}
+    .amount-col{display:none;}
+  </style>
+</head>
+<body class="min-h-screen flex">
+  <!-- 左侧导航 -->
+  <div class="sidebar w-64 flex flex-col">
+    <div class="p-6 border-b border-slate-600">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-lg flex items-center justify-center"><svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+        <div>
+          <h1 class="text-white font-bold text-lg">长坤机械</h1>
+          <p class="text-slate-400 text-xs">订单管理系统</p>
+        </div>
+      </div>
+    </div>
+    <nav class="flex-1 p-4">
+      <ul class="space-y-2">
+        <li><a href="dashboard.html" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:text-white"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg><span>仪表盘</span></a></li>
+        <li><a href="orders.html" class="nav-item active flex items-center space-x-3 px-4 py-3 rounded-lg text-white"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg><span>订单管理</span></a></li>
+        <li><a href="analytics.html" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:text-white"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg><span>数据分析</span></a></li>
+        <li id="settings-nav"><a href="settings.html" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:text-white"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.14,12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94L14.4,2.81c-.04-.24-.24-.41-.48-.41h-3.84c-.24,0-.43.17-.47.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-.22-.08-.47,0-.59.22L2.74,8.87C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.82,11.69,4.82,12s.02.64.07.94l-2.03,1.58c-.18.14-.23.41-.12.61l1.92,3.32c.12.22.37.29.59.22l2.39-.96c.5.38,1.03.7,1.62.94l.36,2.54c.05.24.24.41.48.41h3.84c.24,0,.44-.17.47-.41l.36-2.54c.59-.24,1.13-.56,1.62-.94l2.39.96c.22.08.47,0,.59-.22l1.92-3.32c.12-.22.07-.47-.12-.61L19.14,12.94zM12,15.6c-1.98,0-3.6-1.62-3.6-3.6s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg><span>系统设置</span></a></li>
+      </ul>
+    </nav>
+    <div class="p-4 border-t border-slate-600">
+      <div class="flex items-center space-x-3">
+        <div class="w-8 h-8 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-full flex items-center justify-center"><span id="user-avatar" class="text-white text-sm font-bold">用</span></div>
+        <div class="flex-1">
+          <p id="username" class="text-white text-sm font-medium">用户名</p>
+          <p id="user-role" class="text-slate-400 text-xs">角色</p>
+        </div>
+        <button id="logout-btn" class="text-slate-400 hover:text-white"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 右侧内容 -->
+  <div class="content-area flex-1 flex flex-col">
+    <header class="bg-slate-800 border-b border-slate-700 px-6 py-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-bold text-white">订单管理</h2>
+          <p class="text-slate-400 text-sm">管理所有订单信息和状态</p>
+        </div>
+        <div class="flex items-center space-x-4">
+          <div class="relative"><input
+  type="text"
+  id="search-input"
+  placeholder="搜索 客户/订单/单据编号/物料长代码/长坤物料代码"
+  class="input-field w-64 px-4 py-2 rounded-lg text-white placeholder-slate-500 focus:outline-none pl-10"><svg class="w-5 h-5 text-slate-500 absolute left-3 top-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></div>
+          <input type="file" id="import-file" accept=".xlsx" class="hidden">
+          <button id="import-btn" class="btn-primary px-4 py-2 rounded-lg text-white text-sm">导入 Excel</button>
+          <button id="export-btn" class="btn-primary px-4 py-2 rounded-lg text-white text-sm">导出 Excel</button>
+          <button id="new-order-btn" class="btn-primary px-6 py-2 rounded-lg text-white font-medium"><svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>新建订单</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 p-6 overflow-auto">
+      <!-- 筛选工具栏 -->
+      <div class="card p-4 rounded-xl mb-6">
+        <div class="flex flex-wrap items-center gap-4">
+          <div class="flex items-center space-x-2"><label class="text-slate-300 text-sm">客户名称:</label><input type="text" id="filter-customer" class="input-field px-3 py-1 rounded-lg text-white text-sm" placeholder="请输入客户名称"></div>
+          <div class="flex items-center space-x-2"><label class="text-slate-300 text-sm">规格:</label><select id="filter-spec" class="input-field px-3 py-1 rounded-lg text-white text-sm"><option value="">全部</option></select></div>
+          <div class="flex items-center space-x-2"><label class="text-slate-300 text-sm">订单类别:</label><select id="filter-type" class="input-field px-3 py-1 rounded-lg text-white text-sm"><option value="">全部</option></select></div>
+          <div class="flex items-center space-x-2"><label class="text-slate-300 text-sm">订单状态:</label><select id="filter-status" class="input-field px-3 py-1 rounded-lg text-white text-sm"><option value="">全部</option><option value="技术拆分">技术拆分</option><option value="排版">排版</option><option value="激光切割">激光切割</option><option value="折弯">折弯</option><option value="焊接">焊接</option><option value="涂装">涂装</option><option value="已交货">已交货</option><option value="返修">返修</option><option value="二次交货">二次交货</option></select></div>
+          <div class="flex items-center space-x-2"><label class="text-slate-300 text-sm">下单日期:</label><input type="date" id="filter-date-start" class="input-field px-3 py-1 rounded-lg text-white text-sm"><span class="text-slate-300 text-sm">至</span><input type="date" id="filter-date-end" class="input-field px-3 py-1 rounded-lg text-white text-sm"></div>
+          <button id="reset-filters" class="px-4 py-1 bg-slate-600 hover:bg-slate-700 text-white rounded-lg text-sm transition-colors">重置筛选</button>
+        </div>
+      </div>
+
+      <!-- 订单表格 -->
+      <div class="card rounded-xl overflow-hidden">
+        <div class="overflow-x-auto"><table class="w-full"><thead class="bg-slate-700"><tr>
+          <th class="text-left py-3 px-4 text-slate-300 text-sm font-medium">下单日期</th>
+          <th class="text-left py-3 px-4 text-slate-300 text-sm font-medium">客户名称</th>
+          <th class="text-left py-3 px-4 text-slate-300 text-sm font-medium">订单名称</th>
+          <th class="text-left py-3 px-4 text-slate-300 text-sm font-medium">订单类别</th>
+          <th class="text-left py-3 px-4 text-slate-300 text-sm font-medium">规格</th>
+          <th class="text-left py-3 px-4 text-slate-300 text-sm font-medium">单位</th>
+          <th class="text-left py-3 px-4 text-slate-300 text-sm font-medium">数量</th>
+          <th class="text-left py-3 px-4 text-slate-300 text-sm font-medium">订单状态</th>
+          <th class="text-left py-3 px-4 text-slate-300 text-sm font-medium amount-col">含税单价</th>
+          <th class="text-left py-3 px-4 text-slate-300 text-sm font-medium amount-col">总金额</th>
+          <th class="text-left py-3 px-4 text-slate-300 text-sm font-medium">交货日期</th>
+          <th class="text-left py-3 px-4 text-slate-300 text-sm font-medium">操作</th></tr></thead><tbody id="orders-table"></tbody></table></div>
+        <div class="flex items-center justify-between p-4 border-t border-slate-700"><div class="text-slate-400 text-sm">显示 <span id="page-info">1-20</span> 条，共 <span id="total-count">0</span> 条记录</div><div class="flex items-center space-x-2"><button id="prev-page" class="px-3 py-1 bg-slate-600 hover:bg-slate-700 text-white rounded text-sm disabled:opacity-50">上一页</button><span id="current-page" class="text-slate-300 text-sm">1</span><button id="next-page" class="px-3 py-1 bg-slate-600 hover:bg-slate-700 text-white rounded text-sm disabled:opacity-50">下一页</button></div></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 新建/编辑订单模态框 -->
+  <div id="order-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="card p-6 w-full max-w-4xl rounded-xl overflow-auto max-h-screen">
+      <div class="flex items-center justify-between mb-4"><h3 class="text-xl font-semibold text-white" id="modal-title">新建订单</h3><button id="close-modal" class="text-slate-400 hover:text-white"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button></div>
+      <form id="order-form" class="grid grid-cols-2 gap-4">
+        <!-- 必填 -->
+        <div><label class="block text-sm font-medium text-slate-300 mb-1">下单日期 *</label><input type="date" name="order_date" class="input-field w-full px-3 py-2 rounded-lg text-white" required></div>
+        <div><label class="block text-sm font-medium text-slate-300 mb-1">客户名称 *</label><input type="text" name="customer_name" class="input-field w-full px-3 py-2 rounded-lg text-white" placeholder="请输入客户名称" required></div>
+        <div><label class="block text-sm font-medium text-slate-300 mb-1">订单名称 *</label><input type="text" name="order_name" class="input-field w-full px-3 py-2 rounded-lg text-white" placeholder="请输入订单名称" required></div>
+        <div><label class="block text-sm font-medium text-slate-300 mb-1">订单类别 *</label><select name="order_type" class="input-field w-full px-3 py-2 rounded-lg text-white" required></select></div>
+        <div><label class="block text-sm font-medium text-slate-300 mb-1">数量 *</label><input type="number" name="quantity" class="input-field w-full px-3 py-2 rounded-lg text-white" placeholder="请输入数量" required></div>
+        <div><label class="block text-sm font-medium text-slate-300 mb-1">交货日期 *</label><input type="date" name="delivery_date" class="input-field w-full px-3 py-2 rounded-lg text-white" required></div>
+        <div><label class="block text-sm font-medium text-slate-300 mb-1">订单状态 *</label><select name="status" class="input-field w-full px-3 py-2 rounded-lg text-white" required>
+          <option value="技术拆分">技术拆分</option><option value="排版">排版</option><option value="激光切割">激光切割</option><option value="折弯">折弯</option><option value="焊接">焊接</option><option value="涂装">涂装</option><option value="已交货">已交货</option><option value="返修">返修</option><option value="二次交货">二次交货</option>
+        </select></div>
+
+        <!-- 非必填 -->
+        <div><label class="block text-sm font-medium text-slate-300 mb-1">单据编号</label><input type="text" name="doc_number" class="input-field w-full px-3 py-2 rounded-lg text-white" placeholder="请输入单据编号"></div>
+        <div><label class="block text-sm font-medium text-slate-300 mb-1">物料长代码</label><input type="text" name="material_long_code" class="input-field w-full px-3 py-2 rounded-lg text-white" placeholder="请输入物料长代码"></div>
+        <div><label class="block text-sm font-medium text-slate-300 mb-1">长坤物料代码</label><input type="text" name="ck_material_code" class="input-field w-full px-3 py-2 rounded-lg text-white" placeholder="请输入长坤物料代码"></div>
+        <div><label class="block text-sm font-medium text-slate-300 mb-1">规格</label><select name="specification" class="input-field w-full px-3 py-2 rounded-lg text-white"></select></div>
+        <div><label class="block text-sm font-medium text-slate-300 mb-1">重量 (kg)</label><input type="number" step="0.01" name="weight" class="input-field w-full px-3 py-2 rounded-lg text-white" placeholder="请输入重量"></div>
+        <div><label class="block text-sm font-medium text-slate-300 mb-1">含税单价 (元)</label><input type="number" step="0.01" name="tax_unit_price" class="input-field w-full px-3 py-2 rounded-lg text-white amount-input" placeholder="请输入含税单价"></div>
+        <div><label class="block text-sm font-medium text-slate-300 mb-1">总金额 (元)</label><input type="number" step="0.01" name="total_amount" class="input-field w-full px-3 py-2 rounded-lg text-white amount-input" placeholder="请输入总金额"></div>
+
+        <!-- 单位改为必填 -->
+        <div><label class="block text-sm font-medium text-slate-300 mb-1">单位 *</label><select name="unit" class="input-field w-full px-3 py-2 rounded-lg text-white" required></select></div>
+
+        <!-- 备注非必填 -->
+        <div class="col-span-2"><label class="block text-sm font-medium text-slate-300 mb-1">备注</label><textarea name="remarks" class="input-field w-full px-3 py-2 rounded-lg text-white" placeholder="请输入备注"></textarea></div>
+
+        <div class="col-span-2 flex items-center justify-end space-x-4 mt-4">
+          <button type="button" id="cancel-form" class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg transition-colors">取消</button>
+          <button type="submit" class="btn-primary px-6 py-2 rounded-lg text-white font-medium">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+  /* ---------- 工具函数 ---------- */
+  const toDay = (d) => {
+    if (!d || d === '0000-00-00' || d === 'Invalid Date') return '';
+    return d.slice ? d : new Date(d).toISOString().slice(0,10);
+  };
+  let ordersData=[],currentPage=1,pageSize=10,editingId=null,showAmount=true;
+  const token = () => localStorage.getItem('token');
+
+  /* ---------- 保存按钮拆接口 ---------- */
+  document.getElementById('order-form').onsubmit = async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const data = Object.fromEntries(new FormData(form).entries());
+    const original = ordersData.find(o => o.id === editingId) || {};
+
+    /* 1. 先处理状态（如果状态有变化）*/
+    if (editingId && data.status !== original.status) {
+      const r1 = await fetch(`http://192.168.10.22:3001/api/orders/${editingId}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token() },
+        body: JSON.stringify({ status: data.status })
+      });
+      if (!r1.ok) { alert('状态更新失败：' + (await r1.text())); return; }
+    }
+
+    /* 2. 再处理其它字段（去掉 status，避免重复）*/
+    if (editingId) {
+      const { status, ...payload } = data;
+      if (Object.keys(payload).length) {
+        const r2 = await fetch(`http://192.168.10.22:3001/api/orders/${editingId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token() },
+          body: JSON.stringify(payload)
+        });
+        if (!r2.ok) { alert('订单信息更新失败：' + (await r2.text())); return; }
+      }
+    } else {
+      /* 新建仍走原接口 */
+      const r = await fetch('http://192.168.10.22:3001/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token() },
+        body: JSON.stringify(data)
+      });
+      if (!r.ok) { alert('新建订单失败：' + (await r.text())); return; }
+    }
+
+    closeModal(); loadOrders();
+  };
+  /* -------------------------------------------------- */
+
+  function bindAmountCalc() {
+    const taxInput  = document.querySelector('input[name="tax_unit_price"]');
+    const qtyInput  = document.querySelector('input[name="quantity"]');
+    const amtInput  = document.querySelector('input[name="total_amount"]');
+    function calc() {
+      const price = parseFloat(taxInput.value) || 0;
+      const qty   = parseInt(qtyInput.value)    || 0;
+      if (qty > 0 && price > 0) amtInput.value = (price * qty).toFixed(2);
+    }
+    taxInput.addEventListener('blur', calc);
+    qtyInput.addEventListener('blur', calc);
+  }
+
+  window.editOrder = async (id) => {
+    const res = await fetch(`http://192.168.10.22:3001/api/orders?id=${id}`, {
+      headers: { Authorization: 'Bearer ' + token() }
+    });
+    if (!res.ok) { alert('获取订单失败'); return; }
+    const order = await res.json();
+    openModal(order);
+  };
+
+  function openModal(order = null) {
+    editingId = order ? order.id : null;
+    document.getElementById('modal-title').textContent = order ? '编辑订单' : '新建订单';
+    const form = document.getElementById('order-form');
+    form.reset();
+
+    /* 权限控制：管理员或有 orders.edit 权限才可改字段 */
+    const readonly = !!order && !window._perm?.canEdit;
+    form.querySelectorAll('input, textarea, select').forEach(el => {
+      if (el.name === 'status') el.disabled = false;   // 状态始终可改
+      else el.disabled = readonly;                     // 其余字段按权限灰显
+    });
+
+    if (!order) {
+      form.order_date.value = new Date().toISOString().slice(0,10);
+      form.delivery_date.value = new Date().toISOString().slice(0,10);
+      document.getElementById('order-modal').classList.remove('hidden');
+      bindAmountCalc();
+      return;
+    }
+
+    Object.keys(order).forEach(key => {
+      const input = form.elements[key];
+      if (!input) return;
+      const v = order[key];
+      if (input.type === 'date') input.value = (v && v !== 'null') ? v : '';
+      else if (input.tagName === 'SELECT') {
+        if (v && ![...input.options].some(opt => opt.value === v))
+          input.insertAdjacentHTML('beforeend', `<option value="${v}">${v}</option>`);
+        input.value = v || '';
+      } else input.value = v ?? '';
+    });
+    document.getElementById('order-modal').classList.remove('hidden');
+    bindAmountCalc();
+  }
+
+  function closeModal(){
+    document.getElementById('order-modal').classList.add('hidden');
+    editingId = null;
+  }
+
+  /* 初始化 & 其它事件（略） */
+  document.addEventListener('DOMContentLoaded',()=>{
+    checkUser();
+    loadConfig();
+    autoFilterByUrl();
+    loadOrders();
+    setInterval(loadOrders,5000);
+  });
+
+  function checkUser(){
+    const user=JSON.parse(localStorage.getItem('user'));
+    if(!user)location.href='index.html';
+    document.getElementById('username').textContent=user.username;
+    document.getElementById('user-avatar').textContent=user.username.charAt(0);
+    document.getElementById('user-role').textContent=user.role==='admin'?'管理员':'普通用户';
+    // 不再硬隐系统设置，权限拦截交给 settings.html 内部处理
+    document.getElementById('logout-btn').onclick=()=>{localStorage.clear();location.href='index.html';};
+
+    /* ===== 取当前用户权限 ===== */
+    (async () => {
+      const res = await fetch('http://192.168.10.22:3001/api/user/permissions', {
+        headers: { Authorization: 'Bearer ' + token() }
+      });
+      const list = await res.json();          // ["system.show","orders.edit",...]
+      window._perm = {
+        isAdmin: user.role === 'admin',
+        canEdit: user.role === 'admin' || list.includes('orders.edit'),
+        list
+      };
+    })();
+  }
+
+  async function loadConfig(){
+    const amountRes=await fetch('http://192.168.10.22:3001/api/config/show_amount',{headers:{Authorization:'Bearer '+token()}});
+    const amountData=await amountRes.json();
+    showAmount=amountData.value==='1';
+    if(!showAmount)document.querySelectorAll('.amount-col,.amount-input').forEach(el=>el.style.display='none');
+
+    const catRes=await fetch('http://192.168.10.22:3001/api/config/categories',{headers:{Authorization:'Bearer '+token()}});
+    let categories=await catRes.json();
+    if(!Array.isArray(categories))categories=[];
+    if(!categories.length)categories=[{name:'刀库'},{name:'部装'},{name:'防护'},{name:'伸缩护罩'},{name:'接水盘'},{name:'工装'},{name:'铜管'},{name:'不锈钢管'},{name:'散单'}];
+
+    const specRes=await fetch('http://192.168.10.22:3001/api/config/spec_options',{headers:{Authorization:'Bearer '+token()}});
+    const specData=await specRes.json();
+    let specs=[]; try{specs=JSON.parse(specData.value||'[]');}catch{}
+    if(!Array.isArray(specs)||!specs.length)specs=['φ2','φ4','φ6','φ8','φ10','φ12','φ14','φ16','φ18','φ20'];
+
+    const unitRes=await fetch('http://192.168.10.22:3001/api/config/unit_options',{headers:{Authorization:'Bearer '+token()}});
+    const unitData=await unitRes.json();
+    let units=[]; try{units=JSON.parse(unitData.value||'[]');}catch{}
+    if(!Array.isArray(units)||!units.length)units=['根','套','件','米','公斤'];
+
+    const typeSelect=document.querySelector('select[name="order_type"]');
+    typeSelect.innerHTML=categories.map(c=>`<option value="${c.name}">${c.name}</option>`).join('');
+    document.getElementById('filter-type').innerHTML='<option value="">全部</option>'+categories.map(c=>`<option value="${c.name}">${c.name}</option>`).join('');
+
+    const specSelect=document.querySelector('select[name="specification"]');
+    specSelect.innerHTML='<option value=""></option>'+specs.map(s=>`<option value="${s}">${s}</option>`).join('');
+
+    document.getElementById('filter-spec').innerHTML='<option value="">全部</option>'+specs.map(s=>`<option value="${s}">${s}</option>`).join('');
+
+    const unitSelect=document.querySelector('select[name="unit"]');
+    unitSelect.innerHTML='<option value=""></option>'+units.map(u=>`<option value="${u}">${u}</option>`).join('');
+  }
+
+  function autoFilterByUrl(){
+    const params=new URLSearchParams(location.search);
+    const filter=params.get('filter');
+    if(filter==='today') document.getElementById('filter-date-start').value = new Date().toISOString().slice(0,10);
+  }
+
+  async function loadOrders(){
+    const params = new URLSearchParams(location.search);
+    const filter = params.get('filter');
+    let url = `http://192.168.10.22:3001/api/orders?page=${currentPage}&limit=${pageSize}`;
+    if (filter === 'pending') url += '&status_ne=已交货';
+    if (filter === 'repair')  url += '&status=返修';
+    if (filter === 'today') {
+      const today = new Date().toISOString().slice(0,10);
+      document.getElementById('filter-date-start').value = today;
+      url += '&order_date=' + today;
+    }
+
+    const search=document.getElementById('search-input').value;
+    const status=document.getElementById('filter-status').value;
+    const type=document.getElementById('filter-type').value;
+    const customer=document.getElementById('filter-customer').value;
+    const spec=document.getElementById('filter-spec').value;
+    const dateStart=document.getElementById('filter-date-start').value;
+    const dateEnd=document.getElementById('filter-date-end').value;
+    if(search) url += '&search='+encodeURIComponent(search);
+    if(status) url += '&status='+encodeURIComponent(status);
+    if(type)   url += '&type='+encodeURIComponent(type);
+    if(customer) url += '&customer='+encodeURIComponent(customer);
+    if(spec)   url += '&spec='+encodeURIComponent(spec);
+    if(dateStart) url += '&date_start='+encodeURIComponent(dateStart);
+    if(dateEnd)   url += '&date_end='+encodeURIComponent(dateEnd);
+
+    const res=await fetch(url,{headers:{Authorization:'Bearer '+token()}});
+    const{orders,pagination}=await res.json();
+    ordersData=orders;
+    renderOrders();
+    updatePagination(pagination.total);
+  }
+
+  function renderOrders(){
+    const tbody=document.getElementById('orders-table');
+    tbody.innerHTML='';
+    ordersData.forEach(order=>{
+      const row=document.createElement('tr');
+      row.className='order-row border-b border-slate-700';
+      row.innerHTML=`
+        <td class="py-3 px-4 text-slate-300">${toDay(order.order_date)}</td>
+        <td class="py-3 px-4 text-white">${order.customer_name}</td>
+        <td class="py-3 px-4 text-white">${order.order_name}</td>
+        <td class="py-3 px-4 text-slate-300">${order.order_type}</td>
+        <td class="py-3 px-4 text-slate-300">${order.specification||''}</td>
+        <td class="py-3 px-4 text-slate-300">${order.unit||''}</td>
+        <td class="py-3 px-4 text-slate-300">${order.quantity}</td>
+        <td class="py-3 px-4"><span class="status-badge ${getStatusClass(order.status)}">${order.status}</span></td>
+        <td class="py-3 px-4 text-slate-300 amount-col">${order.tax_unit_price||''}</td>
+        <td class="py-3 px-4 text-slate-300 amount-col">${order.total_amount||''}</td>
+        <td class="py-3 px-4 text-slate-300">${toDay(order.delivery_date)}</td>
+        <td class="py-3 px-4"><div class="flex items-center space-x-2">
+          <button onclick="editOrder(${order.id})" class="text-cyan-400 hover:text-cyan-300 text-sm">编辑</button>
+          <button onclick="printOrder(${order.id})" class="text-green-400 hover:text-green-300 text-sm">打印</button>
+          <button onclick="deleteOrder(${order.id})" class="text-red-400 hover:text-red-300 text-sm">删除</button>
+        </div></td>`;
+      row.ondblclick=()=>editOrder(order.id);
+      tbody.appendChild(row);
+    });
+  }
+
+  function getStatusClass(status){
+    const map={
+      '技术拆分':'status-tech','排版':'status-layout','激光切割':'status-laser','折弯':'status-bend',
+      '焊接':'status-weld','涂装':'status-paint','已交货':'status-delivered','返修':'status-repair','二次交货':'status-sec-delivery'
+    };
+    return map[status]||'status-tech';
+  }
+
+  /* 事件委托 */
+  document.getElementById('search-input').oninput=loadOrders;
+  document.getElementById('filter-type').onchange=loadOrders;
+  document.getElementById('filter-status').onchange=loadOrders;
+  document.getElementById('filter-customer').oninput=loadOrders;
+  document.getElementById('filter-spec').onchange=loadOrders;
+  document.getElementById('filter-date-start').onchange=loadOrders;
+  document.getElementById('filter-date-end').onchange=loadOrders;
+  document.getElementById('reset-filters').onclick=()=>{
+    document.getElementById('search-input').value='';
+    document.getElementById('filter-type').value='';
+    document.getElementById('filter-status').value='';
+    document.getElementById('filter-customer').value='';
+    document.getElementById('filter-spec').value='';
+    document.getElementById('filter-date-start').value='';
+    document.getElementById('filter-date-end').value='';
+    loadOrders();
+  };
+
+  document.getElementById('import-btn').onclick=()=>document.getElementById('import-file').click();
+  document.getElementById('import-file').onchange=async(e)=>{
+    const form=new FormData();
+    form.append('file',e.target.files[0]);
+    await fetch('http://192.168.10.22:3001/api/orders/import',{method:'POST',headers:{Authorization:'Bearer '+token()},body:form});
+    loadOrders();
+  };
+  document.getElementById('export-btn').onclick=async()=>{
+    const path=prompt('请输入导出绝对路径（含文件名.xlsx）：','C:\\订单导出.xlsx');
+    if(!path)return;
+    await fetch('http://192.168.10.22:3001/api/orders/export',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token()},body:JSON.stringify({filePath:path})});
+    alert('导出完成：'+path);
+  };
+
+  document.getElementById('new-order-btn').onclick=()=>openModal();
+  document.getElementById('close-modal').onclick=closeModal;
+  document.getElementById('cancel-form').onclick=closeModal;
+
+  window.printOrder=(id)=>{
+    const w=window.open(`http://192.168.10.22:3001/api/orders/${id}/print-template`);
+    w.onload=()=>w.print();
+  };
+  window.deleteOrder=async(id)=>{
+    if(!confirm('确定删除？'))return;
+    await fetch(`http://192.168.10.22:3001/api/orders/${id}`,{method:'DELETE',headers:{Authorization:'Bearer '+token()}});
+    loadOrders();
+  };
+
+  document.getElementById('prev-page').onclick=()=>{if(currentPage>1){currentPage--;loadOrders();}};
+  document.getElementById('next-page').onclick=()=>{currentPage++;loadOrders();};
+  function updatePagination(total){
+    document.getElementById('total-count').textContent=total;
+    document.getElementById('current-page').textContent=currentPage;
+    const start=(currentPage-1)*pageSize+1;
+    const end=Math.min(currentPage*pageSize,total);
+    document.getElementById('page-info').textContent=total?`${start}-${end}`:'0-0';
+    document.getElementById('prev-page').disabled=currentPage===1;
+    document.getElementById('next-page').disabled=currentPage>=Math.ceil(total/pageSize);
+  }
+  </script>
+</body>
+</html>

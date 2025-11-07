@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>长坤机械订单管理系统 - 数据分析</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+body{font-family:'Noto Sans SC',sans-serif;background:#0f172a;}
+.sidebar{background:linear-gradient(180deg,#1e293b 0%,#334155 100%);border-right:1px solid rgba(148,163,184,.2);}
+.content-area{background:#0f172a;}
+.nav-item{transition:all .3s ease;border-left:3px solid transparent;}
+.nav-item:hover,.nav-item.active{background:rgba(6,182,212,.1);border-left-color:#06b6d4;}
+.card{background:linear-gradient(135deg,rgba(30,41,59,.8) 0%,rgba(51,65,85,.6) 100%);border:1px solid rgba(148,163,184,.2);backdrop-filter:blur(10px);}
+.metric-card{background:linear-gradient(135deg,rgba(6,182,212,.1) 0%,rgba(8,145,178,.05) 100%);border:1px solid rgba(6,182,212,.3);transition:all .3s ease;}
+.metric-card:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(6,182,212,.2);}
+.input-field{background:rgba(15,23,42,.8);border:1px solid rgba(148,163,184,.3);transition:all .3s ease;}
+.input-field:focus{border-color:#06b6d4;box-shadow:0 0 0 3px rgba(6,182,212,.1);}
+.btn-primary{background:linear-gradient(135deg,#06b6d4,#0891b2);transition:all .3s ease;}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(6,182,212,.3);}
+</style>
+</head>
+<body class="min-h-screen flex">
+<!-- 左侧导航 -->
+<div class="sidebar w-64 flex flex-col">
+  <div class="p-6 border-b border-slate-600">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-lg flex items-center justify-center"><svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      <div>
+        <h1 class="text-white font-bold text-lg">长坤机械</h1>
+        <p class="text-slate-400 text-xs">订单管理系统</p>
+      </div>
+    </div>
+  </div>
+  <nav class="flex-1 p-4">
+    <ul class="space-y-2">
+      <li><a href="dashboard.html" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:text-white"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg><span>仪表盘</span></a></li>
+      <li><a href="orders.html" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:text-white"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg><span>订单管理</span></a></li>
+      <li><a href="analytics.html" class="nav-item active flex items-center space-x-3 px-4 py-3 rounded-lg text-white"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg><span>数据分析</span></a></li>
+      <li id="settings-nav" style="display:none;"><a href="settings.html" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:text-white"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.14,12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94L14.4,2.81c-.04-.24-.24-.41-.48-.41h-3.84c-.24,0-.43.17-.47.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-.22-.08-.47,0-.59.22L2.74,8.87C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.82,11.69,4.82,12s.02.64.07.94l-2.03,1.58c-.18.14-.23.41-.12.61l1.92,3.32c.12.22.37.29.59.22l2.39-.96c.5.38,1.03.7,1.62.94l.36,2.54c.05.24.24.41.48.41h3.84c.24,0,.44-.17.47-.41l.36-2.54c.59-.24,1.13-.56,1.62-.94l2.39.96c.22.08.47,0,.59-.22l1.92-3.32c.12-.22.07-.47-.12-.61L19.14,12.94zM12,15.6c-1.98,0-3.6-1.62-3.6-3.6s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg><span>系统设置</span></a></li>
+    </ul>
+  </nav>
+  <div class="p-4 border-t border-slate-600">
+    <div class="flex items-center space-x-3">
+      <div class="w-8 h-8 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-full flex items-center justify-center"><span id="user-avatar" class="text-white text-sm font-bold">用</span></div>
+      <div class="flex-1">
+        <p id="username" class="text-white text-sm font-medium">用户名</p>
+        <p id="user-role" class="text-slate-400 text-xs">角色</p>
+      </div>
+      <button id="logout-btn" class="text-slate-400 hover:text-white"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM2 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg></button>
+    </div>
+  </div>
+</div>
+
+<!-- 右侧内容 -->
+<div class="content-area flex-1 flex flex-col">
+  <header class="bg-slate-800 border-b border-slate-700 px-6 py-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-bold text-white">数据分析</h2>
+        <p class="text-slate-400 text-sm">多维度订单数据统计分析</p>
+      </div>
+      <div class="flex items-center space-x-4">
+        <button id="export-btn" class="btn-primary px-6 py-2 rounded-lg text-white font-medium"><svg class="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>导出报告</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 p-6 overflow-auto">
+    <!-- 筛选工具栏 -->
+    <div class="card p-4 rounded-xl mb-6">
+      <div class="flex flex-wrap items-center gap-4">
+        <div class="flex items-center space-x-2"><label class="text-slate-300 text-sm">分析维度:</label>
+          <select id="dimension-select" class="input-field px-3 py-1 rounded-lg text-white text-sm">
+            <option value="customer">按客户</option>
+            <option value="type">按订单类别</option>
+            <option value="status">按订单状态</option>
+            <option value="spec">按规格</option>
+            <option value="date">按时间</option>
+          </select>
+        </div>
+        <div class="flex items-center space-x-2"><label class="text-slate-300 text-sm">时间范围:</label>
+          <select id="time-range" class="input-field px-3 py-1 rounded-lg text-white text-sm">
+            <option value="week">本周</option>
+            <option value="month">本月</option>
+            <option value="quarter">本季度</option>
+            <option value="year">本年</option>
+          </select>
+        </div>
+        <div class="flex items-center space-x-2"><label class="text-slate-300 text-sm">图表类型:</label>
+          <select id="chart-type" class="input-field px-3 py-1 rounded-lg text-white text-sm">
+            <option value="bar">柱状图</option>
+            <option value="line">折线图</option>
+            <option value="pie">饼图</option>
+            <option value="scatter">散点图</option>
+          </select>
+        </div>
+        <button id="refresh-analysis" class="px-4 py-1 bg-slate-600 hover:bg-slate-700 text-white rounded-lg text-sm transition-colors">刷新分析</button>
+      </div>
+    </div>
+
+    <!-- 关键指标卡片 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+      <div class="metric-card p-6 rounded-xl"><div class="flex items-center justify-between"><div><p class="text-slate-400 text-sm">总订单数</p><p class="text-3xl font-bold text-white mt-1" id="total-orders">0</p></div><div class="w-12 h-12 bg-cyan-500 bg-opacity-20 rounded-lg flex items-center justify-center"><svg class="w-6 h-6 text-cyan-400" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg></div></div><div class="mt-4"><span class="text-green-400 text-sm">↗ <span id="orders-growth">0.0</span>%</span><span class="text-slate-400 text-sm ml-2">较上期</span></div></div>
+      <div class="metric-card p-6 rounded-xl"><div class="flex items-center justify-between"><div><p class="text-slate-400 text-sm">总金额 (万元)</p><p class="text-3xl font-bold text-white mt-1" id="total-amount">0.0</p></div><div class="w-12 h-12 bg-green-500 bg-opacity-20 rounded-lg flex items-center justify-center"><svg class="w-6 h-6 text-green-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div></div><div class="mt-4"><span class="text-green-400 text-sm">↗ <span id="amount-growth">0.0</span>%</span><span class="text-slate-400 text-sm ml-2">较上期</span></div></div>
+      <div class="metric-card p-6 rounded-xl"><div class="flex items-center justify-between"><div><p class="text-slate-400 text-sm">平均交货周期 (天)</p><p class="text-3xl font-bold text-white mt-1" id="avg-cycle">0.0</p></div><div class="w-12 h-12 bg-orange-500 bg-opacity-20 rounded-lg flex items-center justify-center"><svg class="w-6 h-6 text-orange-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27 6.91 8.26 12 2z"/></svg></div></div><div class="mt-4"><span class="text-red-400 text-sm">↘ <span id="cycle-growth">0.0</span>%</span><span class="text-slate-400 text-sm ml-2">较上期</span></div></div>
+      <div class="metric-card p-6 rounded-xl"><div class="flex items-center justify-between"><div><p class="text-slate-400 text-sm">客户满意度</p><p class="text-3xl font-bold text-white mt-1" id="satisfaction">0.0%</p></div><div class="w-12 h-12 bg-blue-500 bg-opacity-20 rounded-lg flex items-center justify-center"><svg class="w-6 h-6 text-blue-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div></div><div class="mt-4"><span class="text-green-400 text-sm">↗ <span id="satisfaction-growth">0.0</span>%</span><span class="text-slate-400 text-sm ml-2">较上期</span></div></div>
+    </div>
+
+    <!-- 图表区域 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <div class="card p-6 rounded-xl">
+        <div class="flex items-center justify-between mb-4"><h3 class="text-lg font-semibold text-white" id="main-chart-title">订单分析</h3>
+          <button id="fullscreen-main" class="text-slate-400 hover:text-white"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zm-3-18v2h3v3h2V5h-5z"/></svg></button>
+        </div>
+        <div id="main-chart" style="height:400px;"></div>
+      </div>
+      <div class="card p-6 rounded-xl">
+        <div class="flex items-center justify-between mb-4"><h3 class="text-lg font-semibold text-white" id="secondary-chart-title">趋势分析</h3>
+          <button id="fullscreen-secondary" class="text-slate-400 hover:text-white"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zm-3-18v2h3v3h2V5h-5z"/></svg></button>
+        </div>
+        <div id="secondary-chart" style="height:400px;"></div>
+      </div>
+    </div>
+
+    <!-- 详细数据表格 -->
+    <div class="card p-6 rounded-xl">
+      <div class="flex items-center justify-between mb-4"><h3 class="text-lg font-semibold text-white">详细数据分析</h3><div class="flex items-center space-x-2"><button id="export-table" class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg text-sm transition-colors">导出表格</button></div></div>
+      <div class="overflow-x-auto"><table class="w-full"><thead><tr class="border-b border-slate-700"><th class="text-left py-3 px-4 text-slate-400 text-sm font-medium">排名</th><th class="text-left py-3 px-4 text-slate-400 text-sm font-medium" id="table-dimension">客户名称</th><th class="text-left py-3 px-4 text-slate-400 text-sm font-medium">订单数量</th><th class="text-left py-3 px-4 text-slate-400 text-sm font-medium">订单金额 (万元)</th><th class="text-left py-3 px-4 text-slate-400 text-sm font-medium">占比</th><th class="text-left py-3 px-4 text-slate-400 text-sm font-medium">同比增长</th></tr></thead><tbody id="analysis-table"></tbody></table></div>
+    </div>
+  </main>
+</div>
+
+<script>
+/* ----------------  全局变量  ---------------- */
+let mainChart=null,secondaryChart=null;
+let currentDimension='customer',currentTimeRange='week',currentChartType='bar';
+
+/* ----------------  入口  ---------------- */
+document.addEventListener('DOMContentLoaded',()=>{
+  checkUser();
+  loadConfig();
+  bindEvents();
+  loadAnalysisData();   // 关键：第一次就拉真数据
+});
+
+/* ----------------  1. 拉数据 + 刷新卡片  ---------------- */
+async function loadAnalysisData(){
+  const res=await fetch(`http://192.168.10.22:3001/api/analytics?dimension=${currentDimension}&timeRange=${currentTimeRange}`,{
+    headers:{Authorization:'Bearer '+localStorage.getItem('token')}
+  });
+  const {analytics,totalAmount}=await res.json(); // 后端多返回一个总金额
+
+  /* 卡片汇总 */
+  const totalOrders   = analytics.reduce((s,i)=>s+Number(i.orders),0);
+  const avgCycle      = analytics.length? (analytics.reduce((s,i)=>s+Number(i.avgCycle||0),0)/analytics.length).toFixed(1) : '0.0';
+  const satisfaction  = analytics.length? (analytics.reduce((s,i)=>s+Number(i.satisfaction||0),0)/analytics.length).toFixed(1) : '0.0';
+
+  document.getElementById('total-orders').textContent = totalOrders;
+  document.getElementById('total-amount').textContent = Number(totalAmount).toFixed(1); // 使用后端给的全量金额
+  document.getElementById('avg-cycle').textContent    = avgCycle;
+  document.getElementById('satisfaction').textContent = satisfaction+'%';
+
+  updateAnalysisTable(analytics);
+  updateMainChart(analytics);
+  updateSecondaryChart(analytics);
+}
+
+/* ----------------  2. 原函数不动  ---------------- */
+function checkUser(){
+  const user=JSON.parse(localStorage.getItem('user'));
+  if(!user)location.href='index.html';
+  document.getElementById('username').textContent=user.username;
+  document.getElementById('user-avatar').textContent=user.username.charAt(0);
+  document.getElementById('user-role').textContent=user.role==='admin'?'管理员':'普通用户';
+  if(user.role==='admin')document.getElementById('settings-nav').style.display='block';
+  document.getElementById('logout-btn').onclick=()=>{localStorage.clear();location.href='index.html';};
+}
+async function loadConfig(){
+  const res=await fetch('http://192.168.10.22:3001/api/config/show_amount',{headers:{Authorization:'Bearer '+localStorage.getItem('token')}});
+  const data=await res.json();
+  if(data.value!=='1')document.querySelectorAll('.hidden-amount').forEach(el=>el.classList.add('hidden'));
+}
+function bindEvents(){
+  document.getElementById('dimension-select').onchange=(e)=>{currentDimension=e.target.value;loadAnalysisData();};
+  document.getElementById('time-range').onchange=(e)=>{currentTimeRange=e.target.value;loadAnalysisData();};
+  document.getElementById('chart-type').onchange=(e)=>{currentChartType=e.target.value;updateMainChart();};
+  document.getElementById('refresh-analysis').onclick=loadAnalysisData;
+  document.getElementById('export-btn').onclick=exportReport;
+  document.getElementById('export-table').onclick=exportTable;
+  document.getElementById('fullscreen-main').onclick=()=>openFullscreen('main-chart');
+  document.getElementById('fullscreen-secondary').onclick=()=>openFullscreen('secondary-chart');
+}
+function updateAnalysisTable(data){
+  const tbody=document.getElementById('analysis-table');
+  tbody.innerHTML='';
+  const totalOrders=data.reduce((sum,item)=>sum+item.orders,0);
+  const totalAmount=data.reduce((sum,item)=>sum+item.amount,0);
+  const dimensionTitles={customer:'客户名称',type:'订单类别',status:'订单状态',spec:'规格',date:'时间'};
+  document.getElementById('table-dimension').textContent=dimensionTitles[currentDimension];
+  data.forEach((item,index)=>{
+    const row=document.createElement('tr');
+    row.className='border-b border-slate-700 hover:bg-slate-800 transition-colors';
+    const orderPercent=((item.orders/totalOrders)*100).toFixed(1);
+    const amountPercent=((item.amount/totalAmount)*100).toFixed(1);
+    const growthColor=item.growth>=0?'text-green-400':'text-red-400';
+    const growthIcon=item.growth>=0?'↗':'↘';
+    row.innerHTML=`
+      <td class="py-3 px-4 text-slate-300">${index+1}</td>
+      <td class="py-3 px-4 text-white font-medium">${item.name}</td>
+      <td class="py-3 px-4 text-slate-300">${item.orders}</td>
+      <td class="py-3 px-4 text-slate-300 hidden-amount">${item.amount.toFixed(1)}</td>
+      <td class="py-3 px-4 text-slate-300">${orderPercent}% / ${amountPercent}%</td>
+      <td class="py-3 px-4 ${growthColor}">${growthIcon} ${Math.abs(item.growth).toFixed(1)}%</td>`;
+    tbody.appendChild(row);
+  });
+}
+function updateMainChart(data){
+  const option={
+    backgroundColor:'transparent',
+    textStyle:{color:'#cbd5e1'},
+    tooltip:{trigger:'item',backgroundColor:'rgba(30,41,59,.9)',borderColor:'rgba(148,163,184,.2)',textStyle:{color:'#e2e8f0'}},
+    legend:{orient:'vertical',left:'left',textStyle:{color:'#94a3b8'}},
+    series:[{name:'订单分析',type:currentChartType==='pie'?'pie':'bar',radius:currentChartType==='pie'?['40%','70%']:null,data:data.map(item=>({value:item.orders,name:item.name})),emphasis:{itemStyle:{shadowBlur:10,shadowOffsetX:0,shadowColor:'rgba(0,0,0,.5)'}},itemStyle:{borderRadius:5,borderColor:'#1e293b',borderWidth:2},color:['#06b6d4','#0891b2','#0e7490','#155e75','#164e63','#115e59','#134e4a','#0f766e']}]
+  };
+  if(currentChartType!=='pie'){
+    option.xAxis={type:'category',data:data.map(item=>item.name),axisLine:{lineStyle:{color:'#475569'}},axisLabel:{color:'#94a3b8',rotate:45,interval:0}};
+    option.yAxis={type:'value',axisLine:{lineStyle:{color:'#475569'}},axisLabel:{color:'#94a3b8'},splitLine:{lineStyle:{color:'#334155'}}};
+    option.grid={left:'3%',right:'4%',bottom:'3%',containLabel:true};
+  }
+  if(!mainChart)mainChart=echarts.init(document.getElementById('main-chart'));
+  mainChart.setOption(option);
+}
+function updateSecondaryChart(data){
+  const option={
+    backgroundColor:'transparent',
+    textStyle:{color:'#cbd5e1'},
+    tooltip:{trigger:'axis',backgroundColor:'rgba(30,41,59,.9)',borderColor:'rgba(148,163,184,.2)',textStyle:{color:'#e2e8f0'}},
+    legend:{data:['订单数量','订单金额'],textStyle:{color:'#94a3b8'}},
+    grid:{left:'3%',right:'4%',bottom:'3%',containLabel:true},
+    xAxis:{type:'category',data:data.map(item=>item.name),axisLine:{lineStyle:{color:'#475569'}},axisLabel:{color:'#94a3b8',rotate:45,interval:0}},
+    yAxis:[{type:'value',name:'订单数量',axisLine:{lineStyle:{color:'#475569'}},axisLabel:{color:'#94a3b8'},splitLine:{lineStyle:{color:'#334155'}}},{type:'value',name:'订单金额(万元)',axisLine:{lineStyle:{color:'#475569'}},axisLabel:{color:'#94a3b8'}}],
+    series:[{name:'订单数量',type:'bar',data:data.map(item=>item.orders),itemStyle:{color:'#06b6d4'}},{name:'订单金额',type:'line',yAxisIndex:1,data:data.map(item=>item.amount),lineStyle:{color:'#f59e0b',width:3},itemStyle:{color:'#f59e0b'}}]
+  };
+  if(!secondaryChart)secondaryChart=echarts.init(document.getElementById('secondary-chart'));
+  secondaryChart.setOption(option);
+}
+function openFullscreen(chartId){
+  const div=document.getElementById(chartId);
+  div.requestFullscreen&&div.requestFullscreen();
+}
+async function exportReport(){
+  const dimension=document.getElementById('dimension-select').value;
+  const timeRange=document.getElementById('time-range').value;
+  const path=prompt('请输入导出报告路径（含文件名.xlsx）：','C:\\分析报告.xlsx');
+  if(!path)return;
+  await fetch('http://192.168.10.22:3001/api/analytics/export',{
+    method:'POST',
+    headers:{'Content-Type':'application/json',Authorization:'Bearer '+localStorage.getItem('token')},
+    body:JSON.stringify({dimension,timeRange,filePath:path})
+  });
+  alert('报告已导出：'+path);
+}
+async function exportTable(){
+  const path=prompt('请输入导出表格路径（含文件名.xlsx）：','C:\\分析表格.xlsx');
+  if(!path)return;
+  await fetch('http://192.168.10.22:3001/api/analytics/export-table',{
+    method:'POST',
+    headers:{'Content-Type':'application/json',Authorization:'Bearer '+localStorage.getItem('token')},
+    body:JSON.stringify({filePath:path})
+  });
+  alert('表格已导出：'+path);
+}
+</script>
+</body>
+</html>
